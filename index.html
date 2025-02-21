@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open Source AI Gateway</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <div class="logo">
+                <span class="gradient-text">Open Source AI Gateway</span>
+            </div>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="docs.html">Docs</a>
+                <a href="https://github.com/wx-yz/ai-gateway" class="github-link">
+                    <i data-feather="github"></i> GitHub
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <header>
+        <div class="hero">
+            <h1>Open Source AI Gateway for <span class="gradient-text">Developers</span></h1>
+            <p class="subtitle">A powerful, production-ready gateway for managing multiple LLM providers with built-in failover, guardrails, caching, and monitoring</p>
+            <div class="cta-buttons">
+                <a href="#getting-started" class="primary-button">Get Started</a>
+                <a href="docs.html" class="secondary-button">Read Docs</a>
+            </div>
+        </div>
+    </header>
+
+    <section class="features" id="features">
+        <h2>Key Features</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <i data-feather="box"></i>
+                <h3>Multi-Provider Support</h3>
+                <p>Seamlessly integrate with OpenAI, Anthropic, Gemini, and Ollama</p>
+            </div>
+            <div class="feature-card">
+                <i data-feather="shield"></i>
+                <h3>Smart Failover</h3>
+                <p>Automatic failover between providers ensures high availability</p>
+            </div>
+            <div class="feature-card">
+                <i data-feather="zap"></i>
+                <h3>Intelligent Caching</h3>
+                <p>Built-in caching system for improved performance and cost savings</p>
+            </div>
+            <div class="feature-card">
+                <i data-feather="bar-chart-2"></i>
+                <h3>Analytics</h3>
+                <p>Metrics and usage analytics dashboard</p>
+            </div>
+            <div class="feature-card">
+                <i data-feather="shield"></i>
+                <h3>Content Guardrails</h3>
+                <p>Configurable content filtering and safety measures</p>
+            </div>
+            <div class="feature-card">
+                <i data-feather="activity"></i>
+                <h3>Enterprise Logging</h3>
+                <p>Integration with Splunk, Datadog, and Elasticsearch</p>
+            </div>
+        </div>
+    </section>
+    
+    <section class="getting-started" id="getting-started">
+        <h2>Getting Started</h2>
+        <div class="setup-steps">
+            <div class="step-card">
+                <div class="step-number">1</div>
+                <h3>Configure</h3>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Config.toml file</span>
+                        <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><code>[openAIConfig]
+apiKey = "Your_API_Key"
+model = "gpt-4"
+endpoint = "https://api.openai.com"</code></pre>
+                </div>
+                <p>Create a <code>Config.toml</code> file with your API configuration</p>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">2</div>
+                <h3>Run</h3>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Docker command</span>
+                        <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><code>docker run -p 8080:8080 -p 8081:8081 \
+-v $(pwd)/Config.toml:/home/ballerina/Config.toml \
+chintana/ai-gateway:v1.0.0</code></pre>
+                </div>
+                <p>Start the container with your configuration mounted</p>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">3</div>
+                <h3>Use</h3>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>curl command</span>
+                        <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><code>curl -X POST http://localhost:8080/chat \
+    -H "Content-Type: application/json" \
+    -H "x-llm-provider: openai" \
+    -d '{"prompt": "When will we have AGI?"}'</code></pre>
+                </div>
+                <p>Start making API requests to your gateway</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Open Source AI Gateway</h4>
+                <p>An open-source project for Developers</p>
+            </div>
+            <div class="footer-section">
+                <h4>Links</h4>
+                <a href="docs.html">Docs</a>
+                <a href="https://github.com/wx-yz/ai-gateway">GitHub</a>
+                <a href="#contributing">Contributing</a>
+            </div>
+            <div class="footer-section">
+                <h4>Community</h4>
+                <a href="#discord">Discord</a>
+                <a href="#twitter">Twitter</a>
+                <a href="#blog">Blog</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        feather.replace();
+        
+        function copyCode(button) {
+            const codeBlock = button.parentElement.nextElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code);
+            
+            button.textContent = 'Copied!';
+            setTimeout(() => {
+                button.textContent = 'Copy';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
