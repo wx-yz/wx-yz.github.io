@@ -32,13 +32,7 @@
                 <h3>Contents</h3>
                 <ul>
                     <li><a href="#getting-started">Getting Started</a></li>
-                    <li><a href="#configuration">Configuration</a></li>
-                    <li><a href="#api-endpoints">API Endpoints</a></li>
-                    <li><a href="#admin-api">Admin API</a></li>
-                    <li><a href="#guardrails">Guardrails</a></li>
-                    <li><a href="#caching">Caching</a></li>
-                    <li><a href="#logging">Logging</a></li>
-                    <li><a href="#analytics">Analytics</a></li>
+                    <li><a href="#usage">Usage</a></li>
                 </ul>
             </div>
         </aside>
@@ -69,168 +63,72 @@ endpoint = "https://api.openai.com"
                         <button class="copy-button" onclick="copyCode(this)">Copy</button>
                     </div>
                     <pre><code>docker run \
--p 8080:8080 -p 8081:8081 \
+-p 8080:8080 -p 8081:8081 -p 8082:8082 \
 -v $(pwd)/Config.toml:/home/ballerina/Config.toml \
-chintana/ai-gateway:v1.0.0</code></pre>
+chintana/ai-gateway:v1.1.0</code></pre>
                 </div>
             </section>
 
-            <section id="configuration">
-                <h2>Configuration</h2>
-                <p>Create a <code>Config.toml</code> file to configure your LLM providers. At least one provider must be configured.</p>
-                
-                <div class="code-block">
-                    <div class="code-header">
-                        <span>Config.toml Example</span>
-                        <button class="copy-button" onclick="copyCode(this)">Copy</button>
-                    </div>
-                    <pre><code>[gateway]
-port = 8080
-adminPort = 8081
-verboseLogging = true
-
-[openAIConfig]
-apiKey = "sk-proj-..."
-model = "gpt-4o"
-endpoint = "https://api.openai.com" 
-
-[anthropicConfig]
-apiKey = "sk-ant-..."
-model = "claude-3-5-sonnet-20241022"
-endpoint = "https://api.anthropic.com"
-
-[ollamaConfig]
-apiKey = "hello"
-model = "llama3.2:latest"
-endpoint = "http://localhost:11434"
-
-[geminiConfig]
-apiKey = "..."
-model = "gemini-1.5-flash"
-endpoint = "https://generativelanguage.googleapis.com/v1beta"
-
-[mistralConfig]
-apiKey = "..."
-model = "mistral-small-latest"
-endpoint = "https://api.mistral.ai"
-
-[cohereConfig]
-apiKey = "..."
-model = "command-r-plus-08-2024"
-endpoint = "https://api.cohere.com"
-</code></pre>
-                </div>
-            </section>
-
-            <section id="api-endpoints">
-                <h2>API Endpoints</h2>
-                <h3>Chat Completion (Port 8080)</h3>
-                <p>Send chat completion requests to any configured provider. Select provider using <code>x-llm-provider</code> header</p>
+            <section id="usage">
+                <h2>Usage</h2>
+                <h3>Using OpenAI API compatible HTTP interface</h3>
+                <p>Send chat completion requests to the gateway using the <code>/v1/chat/completions</code> endpoint. Select the provider using the <code>x-llm-provider</code> header.</p>
                 
                 <div class="code-block">
                     <div class="code-header">
                         <span>Chat Request Example</span>
                         <button class="copy-button" onclick="copyCode(this)">Copy</button>
                     </div>
-                    <pre><code>curl -X POST http://localhost:8080/chat \
-    -H "Content-Type: application/json" \
-    -H "x-llm-provider: openai" \
-    -d '{ "prompt": "What is the capital of France?" }'</code></pre>
+                    <pre><code>curl --location 'http://localhost:8080/v1/chat/completions' \
+--header 'x-llm-provider: ollama' \
+--header 'Content-Type: application/json' \
+--data '{
+    "messages": [{ 
+        "role": "user",
+        "content": "When will we have AGI? In 10 words" 
+        }]
+}'</code></pre>
                 </div>
-            </section>
 
-            <section id="admin-api">
-                <h2>Admin API</h2>
-                <p>The admin API (Port 8081) provides endpoints for configuring and managing the gateway.</p>
-
-                <h3>System Prompt Injection</h3>
-                <p>Inject a system prompt for outging user prompts</p>
+                <h3>Using gRPC interface</h3>
+                <p>See GitHub repo for full example under <code>grpc-client</code> folder</p>
                 <div class="code-block">
                     <div class="code-header">
-                        <span>Configure System Prompt</span>
+                        <span>gRPC Request Example</span>
                         <button class="copy-button" onclick="copyCode(this)">Copy</button>
                     </div>
-                    <pre><code>curl -X POST http://localhost:8081/admin/systemprompt \
-    -H "Content-Type: application/json" \
-    -d '{ "prompt": "Respond in Japanese" }'</code></pre>
-                </div>
+                    <pre><code>def run():
+# Create a gRPC channel
+channel = grpc.insecure_channel('localhost:8082')
+
+# Create a stub (client)
+stub = ai_gateway_pb2_grpc.AIGatewayStub(channel)
+
+# Create a request
+request = ai_gateway_pb2.ChatCompletionRequest(
+    llm_provider="ollama",
+    messages=[
+        ai_gateway_pb2.Message(
+            role="system",
+            content="You are a helpful assistant."
+        ),
+        ai_gateway_pb2.Message(
+            role="user",
+            content="What is the capital of France?"
+        )
+    ]
+)
+
+try:
+    # Make the call
+    response = stub.ChatCompletion(request)
+
+# ...</code></pre>
             </section>
 
-            <section id="guardrails">
-                <h2>Guardrails</h2>
-                <p>Configure content filtering and safety measures for all responses.</p>
-                
-                <div class="code-block">
-                    <div class="code-header">
-                        <span>Configure Guardrails</span>
-                        <button class="copy-button" onclick="copyCode(this)">Copy</button>
-                    </div>
-                    <pre><code>curl -X POST http://localhost:8081/admin/guardrails \
-    -H "Content-Type: application/json" \
-    -d '{
-        "bannedPhrases": ["harmful", "inappropriate"],
-        "minLength": 10,
-        "maxLength": 2000,
-        "requireDisclaimer": true,
-        "disclaimer": "AI-generated response"
-    }'</code></pre>
-                </div>
-            </section>
-
-            <section id="caching">
-                <h2>Caching</h2>
-                <p>The gateway includes an in-memory cache with configurable TTL for improved performance.</p>
-                
-                <div class="code-block">
-                    <div class="code-header">
-                        <span>Cache Management</span>
-                        <button class="copy-button" onclick="copyCode(this)">Copy</button>
-                    </div>
-                    <pre><code># View cache contents
-curl http://localhost:8081/admin/cache
-
-# Clear cache
-curl -X DELETE http://localhost:8081/admin/cache</code></pre>
-                </div>
-            </section>
-
-            <section id="logging">
-                <h2>Logging</h2>
-                <p>Configure enterprise logging integrations and verbosity levels.</p>
-                
-                <div class="code-block">
-                    <div class="code-header">
-                        <span>Configure Logging</span>
-                        <button class="copy-button" onclick="copyCode(this)">Copy</button>
-                    </div>
-                    <pre><code>curl -X POST http://localhost:8081/admin/logging \
-    -H "Content-Type: application/json" \
-    -d '{
-        "enableSplunk": true,
-        "splunkEndpoint": "http://splunk:8088",
-        "enableDatadog": true,
-        "datadogEndpoint": "http://datadog-agent:8125"
-    }'</code></pre>
-                </div>
-            </section>
-
-            <section id="analytics">
-                <h2>Analytics</h2>
-                <p>Access the analytics dashboard to monitor usage, performance, and errors.</p>
-                
-                <div class="info-box">
-                    <i data-feather="info"></i>
-                    <p>View the analytics dashboard at <code>http://localhost:8081/admin/stats</code></p>
-                </div>
-                
-                <p>The dashboard provides:</p>
-                <ul class="feature-list">
-                    <li>Request counts by provider</li>
-                    <li>Token usage statistics</li>
-                    <li>Cache hit rates</li>
-                    <li>Error tracking</li>
-                    <li>Real-time monitoring</li>
-                </ul>
+            <section id="moreinfo">
+                <h2>More info on GitHub</h2>
+                <p>Please refer README file in <a href="https://github.com/wx-yz/ai-gateway">GitHub repo</a> for more information on how to use the AI Gateway</p>
             </section>
         </main>
     </div>
