@@ -43,7 +43,12 @@
             <div class="feature-card">
                 <i data-feather="box"></i>
                 <h3>Multi-Provider Support</h3>
-                <p>Seamlessly integrate with OpenAI, Anthropic, Gemini, and Ollama</p>
+                <p>Seamlessly integrate with OpenAI, Anthropic, Gemini, Ollama, Mistral, and Cohere</p>
+            </div>
+            <div class="feature-card">
+                <i data-feather="file-text"></i>
+                <h3>HTTP or gRPC</h3>
+                <p>OpenAI API compatible HTTP interface and high performance gRPC interface</p>
             </div>
             <div class="feature-card">
                 <i data-feather="shield"></i>
@@ -53,12 +58,17 @@
             <div class="feature-card">
                 <i data-feather="zap"></i>
                 <h3>Intelligent Caching</h3>
-                <p>Built-in caching system for improved performance and cost savings</p>
+                <p>Built-in caching system with configurable TTL for cost savings</p>
+            </div>
+            <div class="feature-card">
+                <i data-feather="x-octagon"></i>
+                <h3>Rate Limiting</h3>
+                <p>Fully configurable rate limiting policy</p>
             </div>
             <div class="feature-card">
                 <i data-feather="bar-chart-2"></i>
-                <h3>Analytics</h3>
-                <p>Metrics and usage analytics dashboard</p>
+                <h3>Admin Dashboard</h3>
+                <p>Monitor usage, tokens, errors and configure gateway</p>
             </div>
             <div class="feature-card">
                 <i data-feather="shield"></i>
@@ -69,6 +79,11 @@
                 <i data-feather="activity"></i>
                 <h3>Enterprise Logging</h3>
                 <p>Integration with Splunk, Datadog, and Elasticsearch</p>
+            </div>
+            <div class="feature-card">
+                <i data-feather="user"></i>
+                <h3>System Prompt Injection</h3>
+                <p>Intercept and inject system prompts for all outgoing requests</p>
             </div>
         </div>
     </section>
@@ -100,9 +115,9 @@ endpoint = "https://api.openai.com"</code></pre>
                         <span>Docker command</span>
                         <button class="copy-button" onclick="copyCode(this)">Copy</button>
                     </div>
-                    <pre><code>docker run -p 8080:8080 -p 8081:8081 \
+                    <pre><code>docker run -p 8080:8080 -p 8081:8081 -p 8082:8082 \
 -v $(pwd)/Config.toml:/home/ballerina/Config.toml \
-chintana/ai-gateway:v1.0.0</code></pre>
+chintana/ai-gateway:v1.1.0</code></pre>
                 </div>
                 <p>Start the container with your configuration mounted</p>
             </div>
@@ -118,7 +133,7 @@ chintana/ai-gateway:v1.0.0</code></pre>
                     <pre><code>curl -X POST http://localhost:8080/chat \
     -H "Content-Type: application/json" \
     -H "x-llm-provider: openai" \
-    -d '{"prompt": "When will we have AGI?"}'</code></pre>
+    -d '{"messages": [{"role": "user","content": "When will we have AGI? In 10 words"}]}'</code></pre>
                 </div>
                 <p>Start making API requests to your gateway</p>
             </div>
