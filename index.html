@@ -130,7 +130,7 @@ chintana/ai-gateway:v1.1.0</code></pre>
                         <span>curl command</span>
                         <button class="copy-button" onclick="copyCode(this)">Copy</button>
                     </div>
-                    <pre><code>curl -X POST http://localhost:8080/chat \
+                    <pre><code>curl -X POST http://localhost:8080/v1/chat/completions \
     -H "Content-Type: application/json" \
     -H "x-llm-provider: openai" \
     -d '{"messages": [{"role": "user","content": "When will we have AGI? In 10 words"}]}'</code></pre>
